@@ -1,0 +1,72 @@
+# Default guardrail policy.
+#
+# Every detector takes three common keys:
+#   enabled:    true | false                       (default true)
+#   action:     flag | redact | block              (default block)
+#   applies_to: [input] | [output] | [input, output] (default both)
+# Any other key is passed to the detector as an option.
+#
+# The final verdict for a text is the most severe action among all findings:
+#   allow < flag < redact < block
+
+name: default
+
+detectors:
+  length:
+    action: block
+    applies_to: [input]
+    max_chars: 8000
+
+  prompt_injection:
+    action: block
+    applies_to: [input]
+    threshold: 0.7
+
+  secrets:
+    action: redact
+
+  pii:
+    action: redact
+    types: [email, credit_card, ssn, aadhaar, pan, phone, ip_address]
+
+  toxicity:
+    action: block
+    categories:
+      threat:
+        - i will kill you
+        - i am going to kill you
+        - i'm going to hurt you
+        - you will regret this
+      self_harm:
+        - kill yourself
+        - kys
+        - end your life
+      harassment:
+        - you are worthless
+        - nobody likes you
+        - shut up idiot
+      profanity:
+        - fuck
+        - fucking
+        - shit
+        - bitch
+
+  topics:
+    action: block
+    applies_to: [input]
+    categories:
+      weapons:
+        - build a bomb
+        - make a bomb
+        - make explosives
+        - homemade explosive
+        - 3d print a gun
+      malware:
+        - write ransomware
+        - create a keylogger
+        - write a virus
+        - make malware
+      fraud:
+        - fake id
+        - credit card dump
+        - phishing page

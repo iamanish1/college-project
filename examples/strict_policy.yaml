@@ -1,0 +1,28 @@
+# A stricter example policy: block PII and secrets instead of redacting them,
+# and use a lower prompt-injection threshold.
+#
+#   guardrail check --policy examples/strict_policy.yaml "email me at a@b.com"
+
+name: strict
+
+detectors:
+  length:
+    applies_to: [input]
+    max_chars: 2000
+
+  prompt_injection:
+    applies_to: [input]
+    threshold: 0.5
+
+  secrets:
+    action: block
+
+  pii:
+    action: block
+
+  topics:
+    applies_to: [input]
+    categories:
+      competitors:
+        - acme corp
+        - globex
