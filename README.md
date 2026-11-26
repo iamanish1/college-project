@@ -34,7 +34,43 @@ LLM reply ◄── │ same pipeline, filtered by each detector's `applies_to` 
 
 **Actions**, from least to most severe: `allow` < `flag` < `redact` < `block`. The final verdict for a text is the most severe action among all its findings.
 
-## Quick start
+## Quick start: one command
+
+You need Python 3.10 or newer, and Git.
+
+```bash
+git clone https://github.com/iamanish1/college-project.git
+cd college-project
+```
+
+Then run the start script:
+
+| OS | Command |
+|---|---|
+| Windows (PowerShell or Command Prompt) | `.\start.bat` |
+| macOS / Linux / Git Bash | `./start.sh` |
+
+The script does everything:
+
+1. Finds Python 3.10+
+2. Creates a `.venv` virtual environment (first run only)
+3. Installs dependencies (first run, or when `pyproject.toml` changes)
+4. Runs the test suite
+5. Starts the server and opens the playground at http://127.0.0.1:8000
+
+Press `Ctrl+C` to stop. Running it again later is fast, because setup is skipped.
+
+Options:
+
+| Windows | macOS / Linux | Effect |
+|---|---|---|
+| `-Port 8080` | `--port 8080` | Use another port |
+| `-SkipTests` | `--skip-tests` | Start without running tests |
+| `-NoBrowser` | `--no-browser` | Don't open the browser |
+
+To use the `guardrail` command or run `pytest` yourself in another terminal, activate the environment first: `.venv\Scripts\Activate.ps1` on Windows, or `source .venv/bin/activate` on macOS/Linux.
+
+## Manual setup
 
 ```bash
 python -m venv .venv

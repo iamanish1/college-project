@@ -37,13 +37,33 @@ def _cmd_check(args: argparse.Namespace) -> int:
     return 1 if result.action.value == "block" else 0
 
 
+def _open_when_ready(url: str) -> None:
+    """Wait for the server to answer /health, then open the playground in the browser."""
+    import time
+    import urllib.request
+    import webbrowser
+
+    for _ in range(60):
+        try:
+            urllib.request.urlopen(f"{url}/health", timeout=1)
+        except OSError:
+            time.sleep(0.5)
+            continue
+        webbrowser.open(url)
+        return
+
+
 def _cmd_serve(args: argparse.Namespace) -> int:
     import os
+    import threading
 
     import uvicorn
 
     if args.policy:
         os.environ["GUARDRAIL_POLICY"] = args.policy
+    if args.open:
+        host = "127.0.0.1" if args.host in ("0.0.0.0", "::") else args.host
+        threading.Thread(target=_open_when_ready, args=(f"http://{host}:{args.port}",), daemon=True).start()
     uvicorn.run("guardrail.api:app", host=args.host, port=args.port, reload=args.reload)
     return 0
 
@@ -64,6 +84,7 @@ def main(argv: list[str] | None = None) -> int:
     p_serve.add_argument("--port", type=int, default=8000)
     p_serve.add_argument("--policy", help="Path to a policy YAML file")
     p_serve.add_argument("--reload", action="store_true")
+    p_serve.add_argument("--open", action="store_true", help="Open the playground in a browser once running")
     p_serve.set_defaults(func=_cmd_serve)
 
     args = parser.parse_args(argv)
